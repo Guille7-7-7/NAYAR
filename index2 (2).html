@@ -275,7 +275,6 @@
     .kpi-card::before { background: var(--accent); }
     .kpi-card:hover   { box-shadow: 0 4px 28px var(--accent-glow); }
 
-    .kpi-icon { font-size: 28px; margin-bottom: 10px; display: block; }
 
     .kpi-label {
       font-size: 13px;
@@ -348,7 +347,6 @@
       box-shadow: 0 6px 20px rgba(17,24,39,0.10);
     }
 
-    .device-emoji { font-size: 36px; display: block; margin-bottom: 10px; }
 
     .device-name { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 8px; }
 
@@ -492,27 +490,24 @@
 
   <!-- KPI CARDS -->
   <div class="section-title">
-    <h2>📊 Resumen ahora mismo</h2>
+    <h2>Resumen ahora mismo</h2>
     <div class="section-title-line"></div>
   </div>
 
   <div class="kpi-grid">
     <div class="kpi-card cyan">
-      <span class="kpi-icon">📱</span>
       <div class="kpi-label">Dispositivos en zona</div>
       <div class="kpi-value" id="kpiDevices"><span class="loading-val"></span></div>
       <div class="kpi-unit">detectados ahora mismo</div>
       <span class="kpi-trend" id="trendDevices">—</span>
     </div>
     <div class="kpi-card blue">
-      <span class="kpi-icon">📏</span>
       <div class="kpi-label">Distancia media al sensor</div>
       <div class="kpi-value" id="kpiRssi"><span class="loading-val"></span></div>
       <div class="kpi-unit">metros</div>
       <span class="kpi-trend" id="trendRssi">—</span>
     </div>
     <div class="kpi-card purple">
-      <span class="kpi-icon">🏠</span>
       <div class="kpi-label">Ocupación del espacio</div>
       <div class="kpi-value" id="kpiOccupancy"><span class="loading-val"></span></div>
       <div class="kpi-unit">% del aforo máximo</div>
@@ -522,34 +517,30 @@
 
   <!-- DEVICE TYPES -->
   <div class="section-title">
-    <h2>📡 Tipos de dispositivos detectados</h2>
+    <h2>Tipos de dispositivos detectados</h2>
     <div class="section-title-line"></div>
   </div>
 
   <div class="device-grid">
     <div class="device-card mobile">
-      <span class="device-emoji">📱</span>
       <div class="device-name">Móviles</div>
       <div class="device-count" id="devMobile">—</div>
       <div class="device-pct" id="devMobilePct">—</div>
       <div class="device-bar-track"><div class="device-bar-fill" id="devMobileBar" style="width:0%"></div></div>
     </div>
     <div class="device-card laptop">
-      <span class="device-emoji">💻</span>
       <div class="device-name">Portátiles</div>
       <div class="device-count" id="devLaptop">—</div>
       <div class="device-pct" id="devLaptopPct">—</div>
       <div class="device-bar-track"><div class="device-bar-fill" id="devLaptopBar" style="width:0%"></div></div>
     </div>
     <div class="device-card iot">
-      <span class="device-emoji">🔌</span>
       <div class="device-name">IoT / Smart</div>
       <div class="device-count" id="devIot">—</div>
       <div class="device-pct" id="devIotPct">—</div>
       <div class="device-bar-track"><div class="device-bar-fill" id="devIotBar" style="width:0%"></div></div>
     </div>
     <div class="device-card other">
-      <span class="device-emoji">❓</span>
       <div class="device-name">Otros</div>
       <div class="device-count" id="devOther">—</div>
       <div class="device-pct" id="devOtherPct">—</div>
@@ -559,7 +550,7 @@
 
   <!-- CHARTS -->
   <div class="section-title">
-    <h2>📈 Historial reciente</h2>
+    <h2>Historial reciente</h2>
     <div class="section-title-line"></div>
   </div>
 
