@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NAYAR — Oficinas &amp; Coworking · Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+/* ── VARIABLES ── */
+:root {
+  --black:     #faf7f2;
+  --ink:       #f0ebe0;
+  --panel:     #e8e1d4;
+  --panel2:    #ede8de;
+  --border:    rgba(10,10,10,0.09);
+  --border2:   rgba(10,10,10,0.18);
+  --gold:      #6f17e2;
+  --gold2:     #5c12bd;
+  --gold-dim:  rgba(111,23,226,0.10);
+  --gold-glow: rgba(111,23,226,0.20);
+  --text:      rgba(14,14,18,0.85);
+  --muted:     rgba(14,14,18,0.40);
+  --muted2:    rgba(14,14,18,0.60);
+  --green:     #0d9065;
+  --amber:     #c9a84c;
+  --red:       #dc2626;
+  --blue:      #2563eb;
+  --mono:      'DM Mono', monospace;
+  --serif:     'Cormorant Garamond', serif;
+  --display:   'Bebas Neue', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+
+body {
+  background: var(--black);
+  color: var(--text);
+  font-family: var(--serif);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* NOISE OVERLAY */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+/* ── HEADER ── */
+header {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 60px; height: 68px;
+  background: rgba(250,247,242,0.93);
+  backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--border);
+}
+
+.logo-area    { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+.logo-hex svg { animation: hexPulse 5s ease-in-out infinite; }
+@keyframes hexPulse {
+  0%,100% { filter: drop-shadow(0 0 5px rgba(111,23,226,0.3)); }
+  50%      { filter: drop-shadow(0 0 14px rgba(111,23,226,0.6)); }
+}
+.logo-name    { font-family: var(--display); font-size: 26px; letter-spacing: 6px; color: #0e0e12; }
+.logo-tagline { font-family: var(--mono); font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-top: 2px; }
+
+.header-right { display: flex; align-items: center; gap: 16px; }
+
+.status-pill {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 14px;
+  background: var(--panel); border: 1px solid var(--border);
+  font-family: var(--mono); font-size: 11px; color: var(--text); letter-spacing: 1px;
+}
+.status-dot         { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.status-dot.online  { background: var(--green); box-shadow: 0 0 8px rgba(13,144,101,0.5); animation: blink 2s infinite; }
+.status-dot.offline { background: rgba(14,14,18,0.22); }
+@keyframes blink    { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+.last-update { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+
+/* ── CONFIG BAR ── */
+.config-bar {
+  position: relative; z-index: 1;
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 14px 60px;
+  background: var(--ink); border-bottom: 1px solid var(--border);
+}
+.config-bar label {
+  font-family: var(--mono); font-size: 10px; font-weight: 500;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--muted2); white-space: nowrap;
+}
+.config-bar input {
+  padding: 8px 14px;
+  background: var(--black); border: 1px solid var(--border2); color: #0e0e12;
+  font-family: var(--mono); font-size: 12px; outline: none; width: 180px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.config-bar input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-dim); }
+
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 22px; border: none;
+  background: var(--gold); color: #fff;
+  font-family: var(--mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; font-weight: 500;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-primary:hover { background: var(--gold2); box-shadow: 0 0 18px var(--gold-glow); }
+
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 8px 20px; background: transparent; border: 1px solid var(--border2); color: var(--muted2);
+  font-family: var(--mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-secondary:hover { color: #0e0e12; border-color: rgba(14,14,18,0.5); background: var(--panel); }
+
+/* ── MAIN ── */
+main {
+  padding: 40px 60px 80px;
+  max-width: 1400px; margin: 0 auto;
+  position: relative; z-index: 1;
+}
+
+/* ERROR BANNER */
+.error-banner {
+  margin-bottom: 16px; padding: 12px 16px;
+  background: rgba(220,38,38,0.06); border: 1px solid rgba(220,38,38,0.20);
+  color: var(--red); font-family: var(--mono); font-size: 11px; letter-spacing: 1px;
+  display: none;
+}
+.error-banner:not(:empty) { display: flex; align-items: center; gap: 8px; }
+
+/* ── SECTION LABEL ── */
+.section-label-row {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 20px; margin-top: 48px;
+}
+.section-label-row:first-child { margin-top: 0; }
+.section-label-row h2 {
+  font-family: var(--display); font-size: 14px; letter-spacing: 5px;
+  color: var(--muted2); white-space: nowrap;
+}
+.section-label-row::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, var(--border2), transparent);
+}
+.section-accent {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--gold);
+}
+
+/* ── KPI GRID ── */
+.kpi-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 16px; margin-bottom: 24px;
+}
+@media (max-width: 1000px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px)  { .kpi-grid { grid-template-columns: 1fr; } }
+
+.kpi-card {
+  background: var(--ink); border: 1px solid var(--border);
+  padding: 24px 26px 20px; position: relative; overflow: hidden;
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.2s;
+  animation: fadeUp 0.5s ease both;
+}
+.kpi-card:hover   { transform: translateY(-3px); border-color: var(--border2); }
+.kpi-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--accent); }
+.kpi-card.purple  { --accent: #6f17e2; --accent-glow: rgba(111,23,226,0.12); }
+.kpi-card.green   { --accent: #0d9065; --accent-glow: rgba(13,144,101,0.12); }
+.kpi-card.amber   { --accent: #c9a84c; --accent-glow: rgba(201,168,76,0.12); }
+.kpi-card:hover   { box-shadow: 0 4px 32px var(--accent-glow); }
+
+.kpi-label { font-family: var(--mono); font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+.kpi-value { font-family: var(--display); font-size: 56px; letter-spacing: 2px; color: var(--accent, #0e0e12); line-height: 1; margin-bottom: 6px; }
+.kpi-unit  { font-family: var(--mono); font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+.kpi-trend { position: absolute; top: 20px; right: 20px; font-family: var(--mono); font-size: 10px; color: var(--muted); }
+
+.loading-val {
+  display: inline-block; width: 60px; height: 44px; vertical-align: middle;
+  background: linear-gradient(90deg, var(--panel) 25%, var(--panel2) 50%, var(--panel) 75%);
+  background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 2px;
+}
+@keyframes shimmer { 0% { background-position: -100% 0; } 100% { background-position: 200% 0; } }
+
+/* ── TREND BANNER ── */
+.trend-banner {
+  background: var(--ink); border: 1px solid var(--border);
+  padding: 28px 32px; margin-bottom: 24px;
+  display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: center;
+}
+@media (max-width: 900px) { .trend-banner { grid-template-columns: 1fr; } }
+
+.trend-banner-inner { display: flex; flex-direction: column; gap: 18px; }
+.trend-item         { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.trend-dot          { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.trend-dot.purple   { background: var(--gold); box-shadow: 0 0 8px var(--gold-glow); }
+.trend-dot.green    { background: var(--green); box-shadow: 0 0 8px rgba(13,144,101,0.3); }
+.trend-label        { font-family: var(--display); font-size: 16px; letter-spacing: 3px; color: #0e0e12; }
+.trend-value        {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 2px;
+  color: var(--gold); background: var(--gold-dim); border: 1px solid rgba(111,23,226,0.18); padding: 3px 10px;
+}
+.trend-sub          { font-family: var(--mono); font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
+.trend-spacer       { height: 1px; background: var(--border); }
+
+.trend-week-bars    { display: flex; gap: 8px; align-items: flex-end; height: 80px; }
+.week-bar-wrap      { display: flex; flex-direction: column; align-items: center; gap: 4px; width: 28px; }
+.week-day           { font-family: var(--mono); font-size: 9px; letter-spacing: 1px; color: var(--muted); order: -1; }
+.week-bar-track     { flex: 1; width: 100%; background: var(--panel); display: flex; align-items: flex-end; min-height: 40px; overflow: hidden; }
+.week-bar-fill      { width: 100%; background: var(--gold); opacity: 0.7; transition: height 0.8s cubic-bezier(0.4,0,0.2,1); }
+.week-val           { font-family: var(--mono); font-size: 9px; color: var(--muted); }
+
+/* ── DEVICE GRID ── */
+.device-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 14px; margin-bottom: 24px;
+}
+@media (max-width: 900px) { .device-grid { grid-template-columns: repeat(2, 1fr); } }
+
+.device-card { background: var(--ink); border: 1px solid var(--border); padding: 22px 20px; text-align: center; transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s; }
+.device-card:hover    { transform: translateY(-3px); border-color: var(--border2); box-shadow: 0 6px 24px rgba(14,14,18,0.08); }
+.device-name          { font-family: var(--mono); font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+.device-count         { font-family: var(--display); font-size: 40px; letter-spacing: 2px; color: #0e0e12; line-height: 1; margin-bottom: 4px; }
+.device-pct           { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-bottom: 12px; }
+.device-bar-track     { height: 3px; background: var(--border); overflow: hidden; }
+.device-bar-fill      { height: 100%; transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+.device-card.mobile .device-bar-fill { background: var(--gold); }
+.device-card.laptop .device-bar-fill { background: var(--green); }
+.device-card.iot    .device-bar-fill { background: var(--amber); }
+.device-card.other  .device-bar-fill { background: var(--blue); }
+
+/* ── ZONE TABLE ── */
+.zone-table-wrap    { background: var(--ink); border: 1px solid var(--border); overflow: hidden; margin-bottom: 24px; }
+.zone-table         { width: 100%; border-collapse: collapse; }
+.zone-table th      {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted);
+  padding: 14px 20px; text-align: left; border-bottom: 1px solid var(--border); background: var(--panel2);
+}
+.zone-table td      { font-family: var(--mono); font-size: 11px; letter-spacing: 1px; color: var(--text); padding: 14px 20px; border-bottom: 1px solid var(--border); }
+.zone-table tr:last-child td { border-bottom: none; }
+.zone-table tr:hover td      { background: var(--panel); }
+.zone-name          { font-family: var(--display); font-size: 15px; letter-spacing: 3px; color: #0e0e12; }
+.occ-bar-track      { height: 4px; background: var(--border); width: 120px; overflow: hidden; display: inline-block; vertical-align: middle; margin-left: 8px; }
+.occ-bar-fill       { height: 100%; background: var(--gold); transition: width 0.8s ease; }
+.badge-ok           { color: var(--green); }
+.badge-warn         { color: var(--amber); }
+.badge-full         { color: var(--red); }
+
+/* ── CHARTS ── */
+.charts-row        { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 900px) { .charts-row { grid-template-columns: 1fr; } }
+
+.panel             { background: var(--ink); border: 1px solid var(--border); overflow: hidden; transition: border-color 0.2s; }
+.panel:hover       { border-color: var(--border2); }
+.panel-header      { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; border-bottom: 1px solid var(--border); }
+.panel-title       { font-family: var(--display); font-size: 16px; letter-spacing: 3px; color: #0e0e12; }
+.panel-badge       {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 1px;
+  color: var(--gold); background: var(--gold-dim); border: 1px solid rgba(111,23,226,0.2); padding: 3px 10px;
+}
+.chart-svg-wrap     { padding: 14px 18px; }
+
+/* ── FOOTER ── */
+footer { background: var(--ink); border-top: 1px solid var(--border); position: relative; z-index: 1; }
+.footer-inner {
+  max-width: 1400px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 60px;
+}
+.footer-inner span  { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+.footer-inner .powered { display: flex; align-items: center; gap: 8px; }
+#footerChannel      { color: var(--gold); }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+.kpi-card:nth-child(1) { animation-delay: 0.05s; }
+.kpi-card:nth-child(2) { animation-delay: 0.10s; }
+.kpi-card:nth-child(3) { animation-delay: 0.15s; }
+.reveal         { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1024px) {
+  header, .config-bar, main { padding-left: 28px; padding-right: 28px; }
+  .footer-inner              { padding-left: 28px; padding-right: 28px; }
+}
+@media (max-width: 600px) { .charts-row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <a href="index.html" class="logo-area">
+    <div class="logo-hex">
+      <svg width="32" height="32" viewBox="0 0 44 44" fill="none">
+        <polygon points="22,4 38,13 38,31 22,40 6,31 6,13" fill="rgba(111,23,226,0.10)" stroke="#6f17e2" stroke-width="1.5"/>
+        <polygon points="22,10 32,16 32,28 22,34 12,28 12,16" fill="none" stroke="rgba(111,23,226,0.32)" stroke-width="0.8"/>
+        <circle cx="22" cy="22" r="4" fill="#6f17e2"/>
+        <circle cx="22" cy="22" r="7.5" fill="none" stroke="rgba(111,23,226,0.35)" stroke-width="0.8"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-name">NAYAR</div>
+      <div class="logo-tagline">Oficinas &amp; Coworking · Panel de aforo</div>
+    </div>
+  </a>
+  <div class="header-right">
+    <div class="status-pill">
+      <div class="status-dot offline" id="statusDot"></div>
+      <span id="statusLabel">Sin conexión</span>
+    </div>
+    <div class="last-update" id="lastUpdate"></div>
+  </div>
+</header>
+
+<!-- CONFIG BAR -->
+<div class="config-bar">
+  <label>Canal ID</label>
+  <input type="text" id="channelId" placeholder="ej: 2345678">
+  <label>Clave API</label>
+  <input type="text" id="apiKey" placeholder="ej: XXXXXXXXXXXXXXXX">
+  <button class="btn-primary" onclick="startPolling()">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    Conectar
+  </button>
+  <button class="btn-secondary" onclick="stopPolling()">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+    Detener
+  </button>
+</div>
+
+<!-- DASHBOARD -->
+<main>
+
+  <div class="error-banner" id="errorBanner"></div>
+
+  <!-- KPIs -->
+  <div class="section-label-row">
+    <span class="section-accent">En tiempo real</span>
+    <h2>RESUMEN DEL ESPACIO</h2>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card purple">
+      <div class="kpi-label">Dispositivos detectados</div>
+      <div class="kpi-value" id="kpiDevices"><span class="loading-val"></span></div>
+      <div class="kpi-unit">empleados presentes en tiempo real</div>
+      <span class="kpi-trend" id="trendDevices">—</span>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Ocupación en tiempo real</div>
+      <div class="kpi-value" id="kpiOccupancy"><span class="loading-val"></span></div>
+      <div class="kpi-unit">% de escritorios y salas en uso</div>
+      <span class="kpi-trend" id="trendOcc">—</span>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label">Tiempo medio de estancia</div>
+      <div class="kpi-value" id="kpiDwell"><span class="loading-val"></span></div>
+      <div class="kpi-unit">duración promedio de visitas por zona</div>
+      <span class="kpi-trend" id="trendDwell">—</span>
+    </div>
+  </div>
+
+  <!-- TENDENCIA SEMANAL -->
+  <div class="trend-banner reveal">
+    <div class="trend-banner-inner">
+      <div class="trend-item">
+        <span class="trend-dot purple"></span>
+        <span class="trend-label">Tendencia semanal de uso</span>
+        <span class="trend-value" id="trendWeekly">—</span>
+        <span class="trend-sub">evolución de ocupación día a día</span>
+      </div>
+      <div class="trend-spacer"></div>
+      <div class="trend-item">
+        <span class="trend-dot green"></span>
+        <span class="trend-label">Optimización del espacio</span>
+        <span class="trend-value" id="trendSaving">—</span>
+        <span class="trend-sub">mejora uso del espacio · reduce costes operativos</span>
+      </div>
+    </div>
+    <div class="trend-week-bars">
+      <div class="week-bar-wrap"><span class="week-day">L</span><div class="week-bar-track"><div class="week-bar-fill" id="wb0" style="height:0%"></div></div><span class="week-val" id="wv0">—</span></div>
+      <div class="week-bar-wrap"><span class="week-day">M</span><div class="week-bar-track"><div class="week-bar-fill" id="wb1" style="height:0%"></div></div><span class="week-val" id="wv1">—</span></div>
+      <div class="week-bar-wrap"><span class="week-day">X</span><div class="week-bar-track"><div class="week-bar-fill" id="wb2" style="height:0%"></div></div><span class="week-val" id="wv2">—</span></div>
+      <div class="week-bar-wrap"><span class="week-day">J</span><div class="week-bar-track"><div class="week-bar-fill" id="wb3" style="height:0%"></div></div><span class="week-val" id="wv3">—</span></div>
+      <div class="week-bar-wrap"><span class="week-day">V</span><div class="week-bar-track"><div class="week-bar-fill" id="wb4" style="height:0%"></div></div><span class="week-val" id="wv4">—</span></div>
+      <div class="week-bar-wrap"><span class="week-day">S</span><div class="week-bar-track"><div class="week-bar-fill" id="wb5" style="height:0%"></div></div><span class="week-val" id="wv5">—</span></div>
+      <div class="week-bar-wrap"><span class="week-day">D</span><div class="week-bar-track"><div class="week-bar-fill" id="wb6" style="height:0%"></div></div><span class="week-val" id="wv6">—</span></div>
+    </div>
+  </div>
+
+  <!-- DISPOSITIVOS -->
+  <div class="section-label-row">
+    <span class="section-accent">Tipología</span>
+    <h2>DISPOSITIVOS DETECTADOS</h2>
+  </div>
+
+  <div class="device-grid">
+    <div class="device-card mobile">
+      <div class="device-name">Móviles</div>
+      <div class="device-count" id="devMobile">—</div>
+      <div class="device-pct"   id="devMobilePct">—</div>
+      <div class="device-bar-track"><div class="device-bar-fill" id="devMobileBar" style="width:0%"></div></div>
+    </div>
+    <div class="device-card laptop">
+      <div class="device-name">Portátiles</div>
+      <div class="device-count" id="devLaptop">—</div>
+      <div class="device-pct"   id="devLaptopPct">—</div>
+      <div class="device-bar-track"><div class="device-bar-fill" id="devLaptopBar" style="width:0%"></div></div>
+    </div>
+    <div class="device-card iot">
+      <div class="device-name">IoT / Smart</div>
+      <div class="device-count" id="devIot">—</div>
+      <div class="device-pct"   id="devIotPct">—</div>
+      <div class="device-bar-track"><div class="device-bar-fill" id="devIotBar" style="width:0%"></div></div>
+    </div>
+    <div class="device-card other">
+      <div class="device-name">Otros</div>
+      <div class="device-count" id="devOther">—</div>
+      <div class="device-pct"   id="devOtherPct">—</div>
+      <div class="device-bar-track"><div class="device-bar-fill" id="devOtherBar" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <!-- ZONAS -->
+  <div class="section-label-row">
+    <span class="section-accent">Coworking</span>
+    <h2>OCUPACIÓN POR ZONA</h2>
+  </div>
+
+  <div class="zone-table-wrap reveal">
+    <table class="zone-table">
+      <thead>
+        <tr>
+          <th>Zona</th>
+          <th>Dispositivos</th>
+          <th>Ocupación</th>
+          <th>Estado</th>
+          <th>Última actividad</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="zone-name">OPEN SPACE</span></td>
+          <td id="z1dev">—</td>
+          <td><span id="z1pct">—</span><span class="occ-bar-track"><span class="occ-bar-fill" id="z1bar" style="width:0%"></span></span></td>
+          <td><span class="badge-ok" id="z1status">—</span></td>
+          <td id="z1time" style="font-family:var(--mono);font-size:10px;color:var(--muted)">—</td>
+        </tr>
+        <tr>
+          <td><span class="zone-name">SALA REUNIONES</span></td>
+          <td id="z2dev">—</td>
+          <td><span id="z2pct">—</span><span class="occ-bar-track"><span class="occ-bar-fill" id="z2bar" style="width:0%"></span></span></td>
+          <td><span class="badge-ok" id="z2status">—</span></td>
+          <td id="z2time" style="font-family:var(--mono);font-size:10px;color:var(--muted)">—</td>
+        </tr>
+        <tr>
+          <td><span class="zone-name">DESPACHOS</span></td>
+          <td id="z3dev">—</td>
+          <td><span id="z3pct">—</span><span class="occ-bar-track"><span class="occ-bar-fill" id="z3bar" style="width:0%"></span></span></td>
+          <td><span class="badge-ok" id="z3status">—</span></td>
+          <td id="z3time" style="font-family:var(--mono);font-size:10px;color:var(--muted)">—</td>
+        </tr>
+        <tr>
+          <td><span class="zone-name">ZONA COMÚN</span></td>
+          <td id="z4dev">—</td>
+          <td><span id="z4pct">—</span><span class="occ-bar-track"><span class="occ-bar-fill" id="z4bar" style="width:0%"></span></span></td>
+          <td><span class="badge-ok" id="z4status">—</span></td>
+          <td id="z4time" style="font-family:var(--mono);font-size:10px;color:var(--muted)">—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- GRÁFICOS -->
+  <div class="section-label-row" style="margin-top:48px;">
+    <span class="section-accent">Historial</span>
+    <h2>EVOLUCIÓN RECIENTE</h2>
+  </div>
+
+  <div class="charts-row reveal">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">OCUPACIÓN</span>
+        <span class="panel-badge" id="chartPoints">0 datos</span>
+      </div>
+      <div class="chart-svg-wrap">
+        <svg id="rssiChart" width="100%" height="180" viewBox="0 0 600 180" preserveAspectRatio="none">
+          <text x="300" y="95" text-anchor="middle" fill="rgba(14,14,18,0.22)" font-family="DM Mono, monospace" font-size="11" letter-spacing="3">ESPERANDO DATOS...</text>
+        </svg>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">EMPLEADOS DETECTADOS</span>
+        <span class="panel-badge" id="devChartBadge">—</span>
+      </div>
+      <div class="chart-svg-wrap">
+        <svg id="devChart" width="100%" height="180" viewBox="0 0 600 180" preserveAspectRatio="none">
+          <text x="300" y="95" text-anchor="middle" fill="rgba(14,14,18,0.22)" font-family="DM Mono, monospace" font-size="11" letter-spacing="3">ESPERANDO DATOS...</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <span>NAYAR · Panel Oficinas &amp; Coworking</span>
+    <span id="footerChannel">Canal: —</span>
+    <span class="powered">
+      <svg width="12" height="12" viewBox="0 0 44 44" fill="none">
+        <polygon points="22,4 38,13 38,31 22,40 6,31 6,13" stroke="#6f17e2" stroke-width="2" fill="none"/>
+        <circle cx="22" cy="22" r="4" fill="#6f17e2"/>
+      </svg>
+      Raspberry Pi · ThingSpeak · v2.0
+    </span>
+  </div>
+</footer>
+
+<script src="coworking.js"></script>
+</body>
+</html>
