@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NAYAR — Analítica de espacio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:         #dde1e8;
+      --bg2:        #e8ebf0;
+      --surface:    rgba(220,224,232,0.95);
+      --surface2:   #d4d8e2;
+      --border:     rgba(20,60,130,0.14);
+      --border2:    rgba(20,60,130,0.28);
+      --cyan:       #1a6cff;
+      --cyan-glow:  rgba(26,108,255,0.10);
+      --green:      #00a85e;
+      --amber:      #d97706;
+      --red:        #dc2626;
+      --purple:     #6d28d9;
+      --blue:       #2563eb;
+      --white:      #111827;
+      --text:       rgba(17,24,39,0.82);
+      --muted:      rgba(17,24,39,0.48);
+      --mono:       'Space Mono', monospace;
+      --sans:       'Outfit', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; }
+
+    body {
+      background: var(--bg);
+      font-family: var(--sans);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+    /* HEADER */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      height: 62px;
+      background: rgba(221,225,232,0.94);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo-area { display: flex; align-items: center; gap: 12px; }
+
+    .logo-hex svg {
+      display: block;
+      animation: hexPulse 4s ease-in-out infinite;
+    }
+
+    @keyframes hexPulse {
+      0%,100% { filter: drop-shadow(0 0 6px rgba(26,108,255,0.25)); }
+      50%      { filter: drop-shadow(0 0 14px rgba(26,108,255,0.45)); }
+    }
+
+    .logo-name {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 5px;
+      color: var(--white);
+    }
+
+    .logo-tagline {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .header-right { display: flex; align-items: center; gap: 16px; }
+
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .status-dot.online { background: var(--green); box-shadow: 0 0 8px rgba(0,168,94,0.5); animation: blink 2s infinite; }
+
+    @keyframes blink {
+      0%,100% { opacity: 1; }
+      50%      { opacity: 0.3; }
+    }
+
+    /* MAIN */
+    main {
+      padding: 28px 28px 48px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* SECTION TITLE */
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      margin-top: 36px;
+    }
+
+    .section-title:first-child { margin-top: 0; }
+
+    .section-title h2 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .section-title-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── ESTANCIA ─────────────────────────────────────────────────── */
+    .estancia-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 900px) { .estancia-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .estancia-grid { grid-template-columns: 1fr; } }
+
+    .estancia-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: border-color 0.25s, box-shadow 0.25s, transform 0.2s;
+      box-shadow: 0 1px 4px rgba(17,24,39,0.06);
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .estancia-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border2);
+      box-shadow: 0 6px 20px rgba(17,24,39,0.10);
+    }
+
+    .estancia-zone {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .estancia-time {
+      font-size: 36px;
+      font-weight: 700;
+      color: #111827;
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+
+    .estancia-unit {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .estancia-bar-track {
+      height: 5px;
+      background: rgba(17,24,39,0.10);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .estancia-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 1s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    .estancia-benefit {
+      font-size: 12px;
+      color: var(--green);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* ── DISPOSITIVOS REAL TIME ──────────────────────────────────── */
+    .realtime-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 900px) { .realtime-grid { grid-template-columns: repeat(2, 1fr); } }
+
+    .rt-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 8px;
+      transition: border-color 0.25s, box-shadow 0.25s, transform 0.2s;
+      box-shadow: 0 1px 4px rgba(17,24,39,0.06);
+    }
+
+    .rt-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border2);
+      box-shadow: 0 6px 20px rgba(17,24,39,0.10);
+    }
+
+    .rt-icon {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .rt-zone { font-size: 12px; font-weight: 700; letter-spacing: 0.5px; color: var(--muted); }
+    .rt-count { font-size: 36px; font-weight: 700; color: #111827; line-height: 1; letter-spacing: -1px; }
+    .rt-sub { font-size: 11px; color: var(--muted); }
+
+    .rt-pulse {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      animation: blink 2s infinite;
+    }
+
+    /* ── OCUPACIÓN ────────────────────────────────────────────────── */
+    .ocupacion-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 700px) { .ocupacion-grid { grid-template-columns: 1fr; } }
+
+    .ocup-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 22px;
+      transition: border-color 0.25s, box-shadow 0.25s, transform 0.2s;
+      box-shadow: 0 1px 4px rgba(17,24,39,0.06);
+    }
+
+    .ocup-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border2);
+      box-shadow: 0 6px 20px rgba(17,24,39,0.10);
+    }
+
+    .ocup-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .ocup-label { font-size: 13px; font-weight: 600; color: var(--muted); }
+
+    .ocup-pct {
+      font-size: 38px;
+      font-weight: 700;
+      color: #111827;
+      letter-spacing: -1px;
+      line-height: 1;
+    }
+
+    .ocup-pill {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    .ocup-pill.ok  { background: rgba(0,168,94,0.12);  color: var(--green); border: 1px solid rgba(0,168,94,0.25); }
+    .ocup-pill.mid { background: rgba(217,119,6,0.12);  color: var(--amber); border: 1px solid rgba(217,119,6,0.25); }
+    .ocup-pill.hi  { background: rgba(220,38,38,0.10);  color: var(--red);   border: 1px solid rgba(220,38,38,0.22); }
+
+    .ocup-track {
+      height: 10px;
+      background: rgba(17,24,39,0.08);
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 12px;
+    }
+
+    .ocup-fill {
+      height: 100%;
+      border-radius: 5px;
+      transition: width 1.2s cubic-bezier(0.4,0,0.2,1);
+      position: relative;
+    }
+
+    .ocup-fill::after {
+      content: '';
+      position: absolute;
+      right: 0; top: 0; bottom: 0;
+      width: 6px;
+      background: rgba(255,255,255,0.45);
+      border-radius: 3px;
+    }
+
+    .ocup-detail {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* ── TENDENCIA SEMANAL ────────────────────────────────────────── */
+    .weekly-panel {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(17,24,39,0.06);
+      transition: border-color 0.2s;
+      margin-bottom: 20px;
+    }
+
+    .weekly-panel:hover { border-color: var(--border2); }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .panel-title { font-size: 14px; font-weight: 600; color: var(--text); }
+
+    .panel-badge {
+      font-size: 12px;
+      color: var(--cyan);
+      background: rgba(26,108,255,0.09);
+      border: 1px solid rgba(26,108,255,0.22);
+      border-radius: 6px;
+      padding: 3px 10px;
+    }
+
+    .weekly-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0;
+      padding: 20px 20px 0;
+    }
+
+    @media (max-width: 600px) { .weekly-days { grid-template-columns: repeat(4, 1fr); gap: 8px; } }
+
+    .weekly-day {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 6px;
+    }
+
+    .wd-name {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .wd-bar-wrap {
+      width: 100%;
+      height: 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .wd-bar {
+      width: 70%;
+      border-radius: 4px 4px 0 0;
+      min-height: 4px;
+      transition: height 1s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    .wd-pct {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      margin-top: 6px;
+    }
+
+    .wd-today .wd-name { color: var(--cyan); }
+
+    .weekly-legend {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 20px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .wl-dot {
+      width: 10px; height: 10px;
+      border-radius: 3px;
+      display: inline-block;
+      margin-right: 4px;
+    }
+
+    /* FOOTER */
+    footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 28px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-area">
+    <div class="logo-hex">
+      <svg width="34" height="34" viewBox="0 0 44 44" fill="none">
+        <polygon points="22,4 38,13 38,31 22,40 6,31 6,13"
+          fill="rgba(26,108,255,0.10)" stroke="#1a6cff" stroke-width="1.5"/>
+        <polygon points="22,10 32,16 32,28 22,34 12,28 12,16"
+          fill="none" stroke="rgba(26,108,255,0.32)" stroke-width="0.8"/>
+        <circle cx="22" cy="22" r="4" fill="#1a6cff"/>
+        <circle cx="22" cy="22" r="7.5" fill="none" stroke="rgba(26,108,255,0.35)" stroke-width="0.8"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-name">NAYAR</div>
+      <div class="logo-tagline">Analítica de espacio · v2.0</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="status-pill">
+      <div class="status-dot online"></div>
+      <span>En directo</span>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main>
+
+  <!-- 1. TIEMPO MEDIO DE ESTANCIA -->
+  <div class="section-title">
+    <h2>Tiempo medio de estancia</h2>
+    <div class="section-title-line"></div>
+    <span style="font-size:12px;color:var(--muted);white-space:nowrap;">duración promedio por zona</span>
+  </div>
+
+  <div class="estancia-grid">
+    <div class="estancia-card">
+      <div class="estancia-zone">🏢 Zona A · Oficinas</div>
+      <div>
+        <div class="estancia-time"><span id="estZonaA">47</span><span style="font-size:20px;font-weight:500;color:var(--muted)"> min</span></div>
+        <div class="estancia-unit">tiempo medio de visita hoy</div>
+      </div>
+      <div class="estancia-bar-track"><div class="estancia-bar-fill" id="estZonaABar" style="width:78%;background:#1a6cff;"></div></div>
+      <div class="estancia-benefit">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Mejora uso del espacio y reduce costes operativos
+      </div>
+    </div>
+    <div class="estancia-card">
+      <div class="estancia-zone">🤝 Zona B · Salas reunión</div>
+      <div>
+        <div class="estancia-time"><span id="estZonaB">32</span><span style="font-size:20px;font-weight:500;color:var(--muted)"> min</span></div>
+        <div class="estancia-unit">tiempo medio de visita hoy</div>
+      </div>
+      <div class="estancia-bar-track"><div class="estancia-bar-fill" id="estZonaBBar" style="width:53%;background:#6d28d9;"></div></div>
+      <div class="estancia-benefit">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Mejora uso del espacio y reduce costes operativos
+      </div>
+    </div>
+    <div class="estancia-card">
+      <div class="estancia-zone">☕ Zona C · Áreas comunes</div>
+      <div>
+        <div class="estancia-time"><span id="estZonaC">18</span><span style="font-size:20px;font-weight:500;color:var(--muted)"> min</span></div>
+        <div class="estancia-unit">tiempo medio de visita hoy</div>
+      </div>
+      <div class="estancia-bar-track"><div class="estancia-bar-fill" id="estZonaCBar" style="width:30%;background:#00a85e;"></div></div>
+      <div class="estancia-benefit">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Mejora uso del espacio y reduce costes operativos
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. DISPOSITIVOS EN TIEMPO REAL -->
+  <div class="section-title">
+    <h2>Dispositivos detectados</h2>
+    <div class="section-title-line"></div>
+    <span style="font-size:12px;color:var(--muted);white-space:nowrap;">empleados presentes en tiempo real</span>
+  </div>
+
+  <div class="realtime-grid">
+    <div class="rt-card">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <div class="rt-pulse" style="background:var(--cyan);box-shadow:0 0 8px rgba(26,108,255,0.5);"></div>
+        <div class="rt-zone">Zona A</div>
+      </div>
+      <div class="rt-icon" style="background:rgba(26,108,255,0.10);">🏢</div>
+      <div class="rt-count" id="rtZonaA">24</div>
+      <div class="rt-sub">dispositivos activos</div>
+    </div>
+    <div class="rt-card">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <div class="rt-pulse" style="background:var(--purple);box-shadow:0 0 8px rgba(109,40,217,0.4);"></div>
+        <div class="rt-zone">Zona B</div>
+      </div>
+      <div class="rt-icon" style="background:rgba(109,40,217,0.10);">🤝</div>
+      <div class="rt-count" id="rtZonaB">11</div>
+      <div class="rt-sub">dispositivos activos</div>
+    </div>
+    <div class="rt-card">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <div class="rt-pulse" style="background:var(--green);box-shadow:0 0 8px rgba(0,168,94,0.4);"></div>
+        <div class="rt-zone">Zona C</div>
+      </div>
+      <div class="rt-icon" style="background:rgba(0,168,94,0.10);">☕</div>
+      <div class="rt-count" id="rtZonaC">8</div>
+      <div class="rt-sub">dispositivos activos</div>
+    </div>
+    <div class="rt-card" style="border-color:var(--border2);background:linear-gradient(135deg,var(--bg2),rgba(26,108,255,0.04));">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <div class="rt-pulse" style="background:var(--cyan);box-shadow:0 0 8px rgba(26,108,255,0.5);"></div>
+        <div class="rt-zone">Total edificio</div>
+      </div>
+      <div class="rt-icon" style="background:rgba(26,108,255,0.12);">📡</div>
+      <div class="rt-count" id="rtTotal" style="color:var(--cyan);">43</div>
+      <div class="rt-sub">en todo el edificio</div>
+    </div>
+  </div>
+
+  <!-- 3. OCUPACIÓN EN TIEMPO REAL -->
+  <div class="section-title">
+    <h2>Ocupación en tiempo real</h2>
+    <div class="section-title-line"></div>
+    <span style="font-size:12px;color:var(--muted);white-space:nowrap;">% de escritorios y salas en uso</span>
+  </div>
+
+  <div class="ocupacion-grid">
+    <div class="ocup-card">
+      <div class="ocup-header">
+        <div class="ocup-label">🖥️ Escritorios</div>
+        <span class="ocup-pill ok" id="ocupEscPill">Normal</span>
+      </div>
+      <div class="ocup-pct"><span id="ocupEsc">68</span><span style="font-size:22px;font-weight:500;color:var(--muted)">%</span></div>
+      <div class="ocup-track">
+        <div class="ocup-fill" id="ocupEscBar" style="width:68%;background:linear-gradient(90deg,#1a6cff,#2563eb);"></div>
+      </div>
+      <div class="ocup-detail">
+        <span id="ocupEscDetalle">34 de 50 escritorios ocupados</span>
+        <span id="ocupEscLib">16 libres</span>
+      </div>
+    </div>
+    <div class="ocup-card">
+      <div class="ocup-header">
+        <div class="ocup-label">🤝 Salas de reunión</div>
+        <span class="ocup-pill hi" id="ocupSalaPill">Alta</span>
+      </div>
+      <div class="ocup-pct"><span id="ocupSala">83</span><span style="font-size:22px;font-weight:500;color:var(--muted)">%</span></div>
+      <div class="ocup-track">
+        <div class="ocup-fill" id="ocupSalaBar" style="width:83%;background:linear-gradient(90deg,#d97706,#dc2626);"></div>
+      </div>
+      <div class="ocup-detail">
+        <span id="ocupSalaDetalle">5 de 6 salas ocupadas</span>
+        <span id="ocupSalaLib">1 libre</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. TENDENCIA SEMANAL -->
+  <div class="section-title">
+    <h2>Tendencia semanal de uso</h2>
+    <div class="section-title-line"></div>
+    <span style="font-size:12px;color:var(--muted);white-space:nowrap;">evolución de ocupación día a día</span>
+  </div>
+
+  <div class="weekly-panel">
+    <div class="panel-header">
+      <span class="panel-title">Ocupación media diaria · semana actual</span>
+      <span class="panel-badge" id="weekBadge">Semana —</span>
+    </div>
+    <div class="weekly-days" id="weeklyDays"></div>
+    <div class="weekly-legend">
+      <span><span class="wl-dot" style="background:#1a6cff;"></span>Esta semana</span>
+      <span><span class="wl-dot" style="background:rgba(17,24,39,0.15);"></span>Sin datos / fin de semana</span>
+      <span style="margin-left:auto;">Hoy: <strong style="color:var(--cyan);" id="weeklyHoy">—</strong></span>
+    </div>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <span>NAYAR · Analítica de espacio</span>
+  <span>Raspberry Pi + ThingSpeak</span>
+</footer>
+
+<script src="javascript_nuevo.js"></script>
+</body>
+</html>
